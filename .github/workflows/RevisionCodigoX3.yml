@@ -84,7 +84,7 @@ jobs:
           java-version: '17'
 
       - name: Analizar Java con Maven
-        if: ${{ steps.detect_java.outputs.java == 'true' && exists('pom.xml') }}
+        if: ${{ steps.detect_java.outputs.java == 'true' && hashFiles('pom.xml') != '' }}
         run: mvn -B verify
 
       - name: Analizar Java con Gradle
