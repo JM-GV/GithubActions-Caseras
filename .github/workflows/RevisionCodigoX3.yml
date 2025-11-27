@@ -1,0 +1,92 @@
+name: Revision de Codigo - PythonJavaNode
+
+on:
+  push:
+    branches:
+      - "**"   # cualquier rama
+
+jobs:
+  detect-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Revision del código
+        uses: actions/checkout@v4
+
+      #   DETECCIÓN DEL LENGUAJE
+
+      - name: Detectar Python
+        id: detect_python
+        run: |
+          if [ -n "$(find . -name '*.py')" ]; then
+            echo "python=true" >> $GITHUB_OUTPUT
+          else
+            echo "python=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Detectar Node.js
+        id: detect_node
+        run: |
+          if [ -f "package.json" ]; then
+            echo "node=true" >> $GITHUB_OUTPUT
+          else
+            echo "node=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Detectar Java
+        id: detect_java
+        run: |
+          if [ -f "pom.xml" ] || [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+            echo "java=true" >> $GITHUB_OUTPUT
+          else
+            echo "java=false" >> $GITHUB_OUTPUT
+          fi
+
+      #   ANALISIS PARA PYTHON
+
+      - name: Configurar Python
+        if: ${{ steps.detect_python.outputs.python == 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar flake8
+        if: ${{ steps.detect_python.outputs.python == 'true' }}
+        run: pip install flake8
+
+      - name: Analizar código Python
+        if: ${{ steps.detect_python.outputs.python == 'true' }}
+        run: flake8 .
+
+      #   ANALISIS PARA NODE.JS
+
+      - name: Configurar Node.js
+        if: ${{ steps.detect_node.outputs.node == 'true' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias Node.js
+        if: ${{ steps.detect_node.outputs.node == 'true' }}
+        run: npm install
+
+      - name: Ejecutar ESLint (si existe)
+        if: ${{ steps.detect_node.outputs.node == 'true' && hashFiles('.eslintrc*') != '' }}
+        run: npx eslint .
+
+      #   ANALISIS PARA JAVA
+
+      - name: Configurar JDK
+        if: ${{ steps.detect_java.outputs.java == 'true' }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Analizar Java con Maven
+        if: ${{ steps.detect_java.outputs.java == 'true' && exists('pom.xml') }}
+        run: mvn -B verify
+
+      - name: Analizar Java con Gradle
+        if: ${{ steps.detect_java.outputs.java == 'true' && (exists('build.gradle') || exists('build.gradle.kts')) }}
+        run: ./gradlew check
