@@ -88,5 +88,6 @@ jobs:
         run: mvn -B verify
 
       - name: Analizar Java con Gradle
-        if: ${{ steps.detect_java.outputs.java == 'true' && (exists('build.gradle') || exists('build.gradle.kts')) }}
+        if: ${{ steps.detect_java.outputs.java == 'true' && (hashFiles('build.gradle') != '' || hashFiles('build.gradle.kts') != '') }}
         run: ./gradlew check
+
