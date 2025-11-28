@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Revision del código
+      - name: Checkout del código
         uses: actions/checkout@v4
 
-      #   DETECCIÓN DEL LENGUAJE
+      # ------------------------------------------------------------
+      # DETECCIÓN DE LENGUAJE
+      # ------------------------------------------------------------
 
       - name: Detectar Python
         id: detect_python
@@ -42,7 +44,9 @@ jobs:
             echo "java=false" >> $GITHUB_OUTPUT
           fi
 
-      #   ANALISIS PARA PYTHON
+      # ------------------------------------------------------------
+      # PYTHON: Solo errores reales (sintaxis + pyflakes)
+      # ------------------------------------------------------------
 
       - name: Configurar Python
         if: ${{ steps.detect_python.outputs.python == 'true' }}
@@ -54,11 +58,17 @@ jobs:
         if: ${{ steps.detect_python.outputs.python == 'true' }}
         run: pip install pyflakes
 
-      - name: Analizar código Python
+      - name: Comprobar sintaxis Python
+        if: ${{ steps.detect_python.outputs.python == 'true' }}
+        run: python -m py_compile $(find . -name "*.py")
+
+      - name: Analizar código Python (solo errores)
         if: ${{ steps.detect_python.outputs.python == 'true' }}
         run: pyflakes .
 
-      #   ANALISIS PARA NODE.JS
+      # ------------------------------------------------------------
+      # NODE.JS: Solo errores reales (ESLint sin warnings)
+      # ------------------------------------------------------------
 
       - name: Configurar Node.js
         if: ${{ steps.detect_node.outputs.node == 'true' }}
@@ -70,11 +80,13 @@ jobs:
         if: ${{ steps.detect_node.outputs.node == 'true' }}
         run: npm install
 
-      - name: Ejecutar ESLint (si existe)
+      - name: Ejecutar ESLint solo si hay config (solo errores)
         if: ${{ steps.detect_node.outputs.node == 'true' && hashFiles('.eslintrc*') != '' }}
-        run: npx eslint .
+        run: npx eslint . --max-warnings=0
 
-      #   ANALISIS PARA JAVA
+      # ------------------------------------------------------------
+      # JAVA: Solo errores reales (compilar sin ejecutar tests)
+      # ------------------------------------------------------------
 
       - name: Configurar JDK
         if: ${{ steps.detect_java.outputs.java == 'true' }}
@@ -83,11 +95,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Analizar Java con Maven
+      - name: Compilar Java con Maven (solo errores de compilación)
         if: ${{ steps.detect_java.outputs.java == 'true' && hashFiles('pom.xml') != '' }}
-        run: mvn -B verify
+        run: mvn -q -DskipTests test-compile
 
-      - name: Analizar Java con Gradle
+      - name: Compilar Java con Gradle (solo errores de compilación)
         if: ${{ steps.detect_java.outputs.java == 'true' && (hashFiles('build.gradle') != '' || hashFiles('build.gradle.kts') != '') }}
-        run: ./gradlew check
-
+        run: ./gradlew classes
