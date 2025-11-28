@@ -50,13 +50,13 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Instalar flake8
+      - name: Instalar pyflakes
         if: ${{ steps.detect_python.outputs.python == 'true' }}
-        run: pip install flake8
+        run: pip install pyflakes
 
       - name: Analizar código Python
         if: ${{ steps.detect_python.outputs.python == 'true' }}
-        run: flake8 .
+        run: pyflakes .
 
       #   ANALISIS PARA NODE.JS
 
