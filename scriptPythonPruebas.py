@@ -9,5 +9,6 @@ def saludar():
     print(f"Tu nombre tiene {len(nombre)} caracteres.")
 
 if __name__ == "__main__":
-    saludar(
+    saludar()
+
 
