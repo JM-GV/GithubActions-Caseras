@@ -1,0 +1,29 @@
+
+#####################################################
+### MIGRACION PARA REPOSITORIO BITBUCKET A GITHUB ###
+#####################################################
+
+
+# REQUISITOS PREVIOS (BITBUCKET) #
+
+Crear una App Password con permisos de 
+
+  repository:read
+  webhook:read
+  account:read
+
+# REQUISITOS PREVIOS (GITHUB) #
+
+Crear un Personal Access Token (PAT) o usar GITHUB_TOKEN si el destino es el mismo repositorio.
+Crear un repositorio vacío donde migrar el contenido.
+
+# REQUISITOS PREVIOS (GITHUB ACTIONS) #
+
+Crear dentro de Settings → Secrets and variables → Actions:
+
+Secret	                Valor
+BB_USERNAME	            usuario de Bitbucket
+BB_APP_PASSWORD	        app password
+GH_PAT	                token de GitHub, o usa GITHUB_TOKEN
+BB_REPO_URL	            URL HTTPS al repo Bitbucket
+GH_REPO_URL	            URL HTTPS al nuevo repo GitHub
