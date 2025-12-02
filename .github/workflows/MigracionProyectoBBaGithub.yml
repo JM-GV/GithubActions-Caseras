@@ -1,0 +1,28 @@
+name: Migracion de Proyecto Bitbucket a Github
+
+on:
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout vacío
+      uses: actions/checkout@v4
+
+    - name: Configurar git
+      run: |
+        git config --global user.email "migration@github.local"
+        git config --global user.name "Migration Bot"
+
+    - name: Clonar desde Bitbucket
+      run: |
+        git clone --mirror https://${{ secrets.BB_USERNAME }}:${{ secrets.BB_APP_PASSWORD }}@${{ secrets.BB_REPO_URL }} repo-mirror
+
+    - name: Push a GitHub
+      run: |
+        cd repo-mirror
+        git remote remove origin
+        git remote add origin https://${{ secrets.GH_PAT }}@${{ secrets.GH_REPO_URL }}
+        git push --mirror
