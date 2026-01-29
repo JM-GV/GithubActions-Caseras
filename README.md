@@ -6,5 +6,8 @@ que es un Script básico en Python para hacer pruebas.
 
 CONTENIDO EN .GITHUB/WORKFLOWS
 
-"Revision de Codigo" , que se lanza despues de hacer un cambio en la rama MAIN y analiza errores 
+"Revision de Codigo", que se lanza despues de hacer un cambio en la rama MAIN y analiza errores 
 de código, tanto en archivos Python, Node y Java que se encuentren dentro del repositorio
+
+"Migracion de Proyecto BitBucket a Github", su ejecución es manual y se debe revisar el archivo de la rama MAIN PasosMigracionRepo
+antes de usarlo
