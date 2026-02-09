@@ -1,0 +1,32 @@
+name: Lanzamiento Manual de Contenedor de Pruebas
+
+# 1. Ejecución manual del Workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 2. Descarga el código de tu rama Main (o la rama activa)
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 3. Construye la imagen usando el Dockerfile que creamos antes
+      - name: Construir imagen Docker
+        run: |
+          docker build -t mi-contenedor-prueba .
+
+      # 4. Levanta el contenedor
+      # Usamos -d para que corra en segundo plano y le damos un nombre
+      - name: Levantar contenedor
+        run: |
+          docker run -d --name contenedor_instancia mi-contenedor-prueba
+
+      # 5. Verificación (Opcional pero recomendado)
+      # Comprobamos que el contenedor está corriendo y vemos los logs del script
+      - name: Comprobar estado y logs
+        run: |
+          docker ps
+          docker logs contenedor_instancia
