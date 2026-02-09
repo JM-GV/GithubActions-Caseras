@@ -1,4 +1,5 @@
-print(f"¡Hola, Root!")
+print("¡Hola, Root!")
+
 
 
 
